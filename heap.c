@@ -169,11 +169,11 @@ Queue enq(HeapNode *newNode, Queue queue) {
 					goto next;
 				}
 			} else { //se o no a inserir e um no raiz (sem caracter)
-				goto next;
+				goto insertNewNode;
 			}
 		} else { //se o no analisado e um no raiz (sem caracter)
 			if(newNode->isChar) {
-				goto insertNewNode;
+				goto next;
 			} else {
 				goto next;
 			}
