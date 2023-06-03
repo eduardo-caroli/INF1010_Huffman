@@ -35,6 +35,12 @@ int main(void) {
 	}
 	if(q->node == NULL) printf("I really do become NULL");
 	printTree(q->node);
+	int h = height(q->node);
+	printf("height: %d\n", h);
+	int nNodes = (int)pow(2, h);
+	HeapNode baum[nNodes];
+	makeArrayRepresentation(q->node, baum, 0);
+	printArrTree(baum, 0);
 	#endif
 
 	return 0;

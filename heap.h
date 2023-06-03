@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #define MAX_HEAP_SIZE 256
 #define INT(c) ((int)c)
@@ -35,6 +36,7 @@ typedef qNode* Queue;
 
 Heap newHeap();
 int parse(char *pChars, int *cCount, const char *filename);
+int height(HeapNode *tree);
 void swap(HeapNode *nodes, int pos1, int pos2);
 Queue enq(HeapNode *newNode, Queue queue);
 Queue buildQueue(char *pChars, int *cCount, int nChars);
@@ -43,6 +45,8 @@ Queue createSubTree(Queue queue, bool *cont);
 Queue deq(Queue queue, HeapNode **node);
 HeapNode *newHeapNode(bool isChar, char character, int weight);
 HeapNode *mergeNodes(HeapNode *left, HeapNode *right);
+void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos);
 qNode *newQNode(HeapNode *node);
 void printQ(Queue q);
 void printTree(HeapNode *root);
+void printArrTree(HeapNode *tree, int pos);

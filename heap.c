@@ -6,6 +6,18 @@ Heap newHeap() {
 	return newHeap;
 }
 
+//essa funcao espera que array seja um vetor com espaco o suficiente
+//o espaco necessario para representar uma arvore de HeapNode com alocacao dinamica pode ser obtido por meio da funcao numNodes
+//chame essa funcao passando pos igual a 0 para converter a arvore inteira
+void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos) {
+	array[pos] = *tree;
+	printf("pos: %d -> %c : %d\n", pos, array[pos].isChar ? array[pos].c : '@', array[pos].weight);
+	if(tree->isChar) return;
+	makeArrayRepresentation(tree->l, array, LC(pos));
+	makeArrayRepresentation(tree->r, array, RC(pos));
+	return;
+}
+
 HeapNode *mergeNodes(HeapNode *left, HeapNode *right) {
 	int sum = right->weight + left->weight; 
 	HeapNode *newNode;
@@ -27,6 +39,8 @@ HeapNode *newHeapNode(bool isChar, char character, int weight) {
 	}
 	newNode->weight = weight;
 	newNode->isChar = isChar;
+	newNode->l = NULL;
+	newNode->r = NULL;
 	return newNode;
 }
 
@@ -123,6 +137,15 @@ Queue deq(Queue queue, HeapNode **node) {
 	return aux;
 }
 
+int height(HeapNode *tree) {
+	int maxHeight, lHeight, rHeight;
+	if (tree == NULL) return 0;
+	lHeight = height(tree->l);
+	rHeight = height(tree->r);
+	maxHeight = lHeight > rHeight ? lHeight : rHeight;
+	return 1  + maxHeight;
+}
+
 int parse(char *pChars, int *cCount, const char *filename) {
 	char c, *presentChars;
 	int *charCount, total = 0;
@@ -200,4 +223,11 @@ void printQ(Queue q) {
 	}
 	printQ(q->next);
 	return;
+}
+
+void printArrTree(HeapNode tree[], int pos) {
+	printf("->pos: %d -> %c : %d\n", pos, tree[pos].c, tree[pos].weight);
+	if(tree[pos].isChar) return;	
+	if(tree->l != NULL) printArrTree(tree, LC(pos));
+	if(tree->r != NULL) printArrTree(tree, RC(pos));
 }
