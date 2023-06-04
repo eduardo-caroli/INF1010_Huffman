@@ -13,51 +13,51 @@ typedef int bool;
 #define TRUE 1
 #define FALSE 0
 
-typedef struct _HeapNode{
+typedef struct _HuffmanNode{
 	bool isChar;
 	char c;
 	int weight;
-	struct _HeapNode *l;
-	struct _HeapNode *r;
-} HeapNode;
+	struct _HuffmanNode *l;
+	struct _HuffmanNode *r;
+} HuffmanNode;
 
 typedef struct {
 	int pos;
 	int max;
-	HeapNode keys[MAX_HEAP_SIZE];
+	HuffmanNode keys[MAX_HEAP_SIZE];
 } Heap;
 
-typedef struct _qNode{
-	HeapNode *node;
-	struct _qNode *next;
-} qNode;
+typedef struct _QueueNode{
+	HuffmanNode *node;
+	struct _QueueNode *next;
+} QueueNode;
 
 typedef struct {
 	int bits;
 	int bitCount;
 } BitPattern;
 
-typedef qNode* Queue;
+typedef QueueNode* Queue;
 
 Heap newHeap();
 int parse(char *pChars, int *cCount, const char *filename);
-int height(HeapNode *tree);
-void swap(HeapNode *nodes, int pos1, int pos2);
-Queue enq(HeapNode *newNode, Queue queue);
+int height(HuffmanNode *tree);
+void swap(HuffmanNode *nodes, int pos1, int pos2);
+Queue enq(HuffmanNode *newNode, Queue queue);
 Queue buildQueue(char *pChars, int *cCount, int nChars);
 Queue newQueue();
 Queue createSubTree(Queue queue, bool *cont);
-Queue deq(Queue queue, HeapNode **node);
-HeapNode *newHeapNode(bool isChar, char character, int weight);
-HeapNode *mergeNodes(HeapNode *left, HeapNode *right);
-void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos);
-qNode *newQNode(HeapNode *node);
+Queue deq(Queue queue, HuffmanNode **node);
+HuffmanNode *newHuffmanNode(bool isChar, char character, int weight);
+HuffmanNode *mergeNodes(HuffmanNode *left, HuffmanNode *right);
+void makeArrayRepresentation(HuffmanNode* tree, HuffmanNode *array, int pos);
+QueueNode *newQNode(HuffmanNode *node);
 void printQ(Queue q);
-void printTree(HeapNode *root);
-void printArrTree(HeapNode *tree, int pos);
+void printTree(HuffmanNode *root);
+void printArrTree(HuffmanNode *tree, int pos);
 void writeBit(int bit, FILE *file, bool forceWrite);
 int readBit(FILE *file);
-void makeBitPatternTable(HeapNode *huffmanTree, BitPattern *table, int pattern, int bitCount);
+void makeBitPatternTable(HuffmanNode *huffmanTree, BitPattern *table, int pattern, int bitCount);
 void encode(BitPattern *table, FILE *file);
 void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar);
-void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HeapNode *tree);
+void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HuffmanNode *tree);

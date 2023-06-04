@@ -15,8 +15,8 @@ int main(int argc, char *argv[]) {
 		exit(3);
 	}
 	fread(&nNodes, sizeof(int), 1, binaryFile);
-	HeapNode huffmanTree[nNodes];
-	fread(huffmanTree, sizeof(HeapNode), nNodes, binaryFile);
+	HuffmanNode huffmanTree[nNodes];
+	fread(huffmanTree, sizeof(HuffmanNode), nNodes, binaryFile);
 	nChars = huffmanTree[0].weight;
 	while(nChars > 0) {
 		//funcao que recebe o bitstream biario, o de texto e a arvore e traduz de um para o outro

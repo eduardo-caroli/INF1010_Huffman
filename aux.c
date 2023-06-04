@@ -1,4 +1,5 @@
 #include "heap.h"
+#define showBitStream
 
 Heap newHeap() {
 	Heap newHeap;
@@ -7,9 +8,9 @@ Heap newHeap() {
 }
 
 //essa funcao espera que array seja um vetor com espaco o suficiente
-//o espaco necessario para representar uma arvore de HeapNode com alocacao dinamica pode ser obtido por meio da funcao numNodes
+//o espaco necessario para representar uma arvore de HuffmanNode com alocacao dinamica pode ser obtido por meio da funcao numNodes
 //chame essa funcao passando pos igual a 0 para converter a arvore inteira
-void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos) {
+void makeArrayRepresentation(HuffmanNode* tree, HuffmanNode *array, int pos) {
 	array[pos] = *tree;
 	if(tree->isChar) return;
 	makeArrayRepresentation(tree->l, array, LC(pos));
@@ -17,21 +18,21 @@ void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos) {
 	return;
 }
 
-//essa funcao recebe dois HeapNodes, correspondentes a caracteres ou a nos vazios,
+//essa funcao recebe dois HuffmanNodes, correspondentes a caracteres ou a nos vazios,
 //e cria uma nova arvore, cujos filhos da raiz sao os nos passados como argumento
-HeapNode *mergeNodes(HeapNode *left, HeapNode *right) {
+HuffmanNode *mergeNodes(HuffmanNode *left, HuffmanNode *right) {
 	int sum = right->weight + left->weight; 
-	HeapNode *newNode;
-	newNode = newHeapNode(FALSE, 0, sum);
+	HuffmanNode *newNode;
+	newNode = newHuffmanNode(FALSE, 0, sum);
 	newNode->l = left;
 	newNode->r = right;
 	return newNode;
 }
 
-//aloca espaco e cria um novo HeapNode
-HeapNode *newHeapNode(bool isChar, char character, int weight) {
-	HeapNode *newNode;
-	newNode = (HeapNode*)malloc(sizeof(HeapNode));
+//aloca espaco e cria um novo HuffmanNode
+HuffmanNode *newHuffmanNode(bool isChar, char character, int weight) {
+	HuffmanNode *newNode;
+	newNode = (HuffmanNode*)malloc(sizeof(HuffmanNode));
 	if(newNode == NULL) {
 		fprintf(stderr, "Impossivel alocar espaco. Abortando");
 		exit(1);
@@ -46,8 +47,8 @@ HeapNode *newHeapNode(bool isChar, char character, int weight) {
 	return newNode;
 }
 
-qNode *newQNode(HeapNode *node) {
-	qNode *newNode = (qNode*)malloc(sizeof(qNode));
+QueueNode *newQNode(HuffmanNode *node) {
+	QueueNode *newNode = (QueueNode*)malloc(sizeof(QueueNode));
 	if(newNode == NULL) {
 		fprintf(stderr, "Impossivel alocar espaco. Abortando");
 		exit(2);
@@ -57,8 +58,8 @@ qNode *newQNode(HeapNode *node) {
 	return newNode;
 }
 
-void swap(HeapNode *nodes, int pos1, int pos2) {
-	HeapNode aux = nodes[pos1];
+void swap(HuffmanNode *nodes, int pos1, int pos2) {
+	HuffmanNode aux = nodes[pos1];
 	nodes[pos1] = nodes[pos2];
 	nodes[pos2] = aux;
 }
@@ -89,7 +90,7 @@ void moveDown(Heap heap, int pos) {
 	return;
 }
 
-void printTree(HeapNode *root) {
+void printTree(HuffmanNode *root) {
 	if(root == NULL) return;	
 	if(root->isChar) {
 		printf("%c : %d\n", root->c, root->weight);
@@ -104,7 +105,7 @@ void printTree(HeapNode *root) {
 //essa funcao retira os dois caracteres de menor peso de uma fila, cria uma subarvore
 //e reinsere a subarvore na fila
 Queue createSubTree(Queue queue, bool *cont) {
-	HeapNode *first, *second, *merged;
+	HuffmanNode *first, *second, *merged;
 	Queue q;
 	q = deq(queue, &first);
 	if (q == NULL) {
@@ -123,10 +124,10 @@ Queue createSubTree(Queue queue, bool *cont) {
 //e o numero de caracteres enconjtrados, e monta uma "fila" onde os menores caracteres vem primeiro
 Queue buildQueue(char *pChars, int *cCount, int nChars) {
 	int i;
-	HeapNode *currNode;
+	HuffmanNode *currNode;
 	Queue q = newQueue();
 	for(i = 0; i < nChars; i++) {
-		currNode = newHeapNode(TRUE, pChars[i], cCount[INT(pChars[i])]);
+		currNode = newHuffmanNode(TRUE, pChars[i], cCount[INT(pChars[i])]);
 		q = enq(currNode, q);
 	}
 	return q;
@@ -136,15 +137,15 @@ Queue newQueue() {
 	return NULL;
 }
 
-Queue deq(Queue queue, HeapNode **node) {
+Queue deq(Queue queue, HuffmanNode **node) {
 	*node = queue->node;
-	qNode *aux = queue->next;
+	QueueNode *aux = queue->next;
 	free(queue);
 	return aux;
 }
 
-//essa funcao ibtem a altura de uma arvore de HeapNode ligada dinamicamente
-int height(HeapNode *tree) {
+//essa funcao ibtem a altura de uma arvore de HuffmanNode ligada dinamicamente
+int height(HuffmanNode *tree) {
 	int maxHeight, lHeight, rHeight;
 	if (tree == NULL) return 0;
 	lHeight = height(tree->l);
@@ -184,8 +185,8 @@ int parse(char *pChars, int *cCount, const char *filename) {
 }
 
 //essa funcao insere um no na posicao correta de uma fila ordenada pelo peso do no
-Queue enq(HeapNode *newNode, Queue queue) {
-	qNode *new;
+Queue enq(HuffmanNode *newNode, Queue queue) {
+	QueueNode *new;
 	if (queue == NULL) { 
 		new = newQNode(newNode);
 		return new;
@@ -232,7 +233,7 @@ void printQ(Queue q) {
 	return;
 }
 
-void printArrTree(HeapNode tree[], int pos) {
+void printArrTree(HuffmanNode tree[], int pos) {
 	printf("caracter %c: %d ocorrencias\n", tree[pos].c, tree[pos].weight);
 	if(tree[pos].isChar) return;	
 	if(tree->l != NULL) printArrTree(tree, LC(pos));
@@ -275,7 +276,7 @@ int readBit(FILE *file) {
 
 //monta uma tabela de simbolos em um array de BitPattern de tamanho suficiente (256)
 //no qual o indice eh o caracter desejado.
-void makeBitPatternTable(HeapNode *huffmanTree, BitPattern *table, int pattern, int bitCount) {
+void makeBitPatternTable(HuffmanNode *huffmanTree, BitPattern *table, int pattern, int bitCount) {
 	BitPattern bitPattern;
 	int lPattern, rPattern;
 	if(huffmanTree->isChar) {
@@ -316,10 +317,10 @@ void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar) {
 	}
 }	
 
-void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HeapNode *tree) {
+void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HuffmanNode *tree) {
 	int bit, pos;
 	char c;
-	HeapNode node;
+	HuffmanNode node;
 	pos = 0;
 	node = tree[0];
 	while(!node.isChar) {

@@ -36,13 +36,12 @@ int main(int argc, char *argv[]) {
 	charsLeftToWrite = q->node->weight;
 	int h = height(q->node);
 	int nNodes = (int)pow(2, h);
-	HeapNode baum[nNodes];
+	HuffmanNode baum[nNodes];
 	makeArrayRepresentation(q->node, baum, 0);
 	makeBitPatternTable(q->node,bitPatternTable, 0, 0); 
 	fwrite(&nNodes, sizeof(int), 1, binaryFile);
-	fwrite(baum, sizeof(HeapNode), nNodes, binaryFile);
+	fwrite(baum, sizeof(HuffmanNode), nNodes, binaryFile);
 	//agora vamos codificar o arquivo texto
-	printf("number of characters: %d\n", charsLeftToWrite);
 	while(fscanf(textFile, "%c", &lastReadCharacter) == 1) {
 		writeBitPattern(lastReadCharacter, bitPatternTable, binaryFile, (charsLeftToWrite == 1));
 		charsLeftToWrite--;

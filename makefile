@@ -6,10 +6,10 @@ all: encoder decoder
 	./decoder arquivo.cmp transcrito.txt
 	open transcrito.txt
 
-encoder: heap.c encoder.c
+encoder: aux.c encoder.c
 	clear
-	gcc -Wall -o encoder encoder.c heap.c
+	gcc -Wall -o encoder encoder.c aux.c
 
-decoder: heap.c decoder.c
+decoder: aux.c decoder.c
 	clear
-	gcc -Wall -o decoder decoder.c heap.c
+	gcc -Wall -o decoder decoder.c aux.c
