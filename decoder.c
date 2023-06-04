@@ -1,18 +1,23 @@
 #include "heap.h"
 
-int main(void) {
+int main(int argc, char *argv[]) {
 	int nNodes, nChars;
 	FILE *binaryFile;
 	FILE *textFile;
-	binaryFile = fopen("exemplo.cmp", "rb");
-	textFile = fopen("translated.txt", "w");
+	binaryFile = fopen(argv[1], "rb");
+	if(binaryFile == NULL) {
+		fprintf(stderr, "Impossivel abrir o arquivo binario solicitado\n");
+		exit(2);
+	}
+	textFile = fopen(argv[2], "w");
+	if(textFile == NULL) {
+		fprintf(stderr, "Impossivel abrir o arquivo texto solicitado\n");
+		exit(3);
+	}
 	fread(&nNodes, sizeof(int), 1, binaryFile);
-	printf("nNodes: %d\n", nNodes);
 	HeapNode huffmanTree[nNodes];
 	fread(huffmanTree, sizeof(HeapNode), nNodes, binaryFile);
-	printArrTree(huffmanTree, 0);
 	nChars = huffmanTree[0].weight;
-	printf("==> %d\n", nChars);
 	while(nChars > 0) {
 		//funcao que recebe o bitstream biario, o de texto e a arvore e traduz de um para o outro
 		translateSingleCharacter(binaryFile, textFile, huffmanTree);

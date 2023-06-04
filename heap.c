@@ -115,7 +115,6 @@ Queue createSubTree(Queue queue, bool *cont) {
 	q = deq(q, &second);
 	merged = mergeNodes(first, second);
 	q = enq(merged, q);
-	if(q==NULL) {printf("wrong here\n");}
 	return q;
 }
 
@@ -191,9 +190,6 @@ Queue enq(HeapNode *newNode, Queue queue) {
 		new = newQNode(newNode);
 		return new;
 	}
-	if(newNode == NULL) printf("newNode is NULL\n");
-	if(queue == NULL) printf("queue is NULL\n");
-	if(queue->node == NULL) printf("queue->node is NULL\n");
 	if (newNode->weight == queue->node->weight) {
 		if (queue->node->isChar) { //se o no analisado e um caracter
 			if(newNode->isChar) { //se o no a inserir e um caracter
@@ -285,7 +281,6 @@ void makeBitPatternTable(HeapNode *huffmanTree, BitPattern *table, int pattern, 
 	if(huffmanTree->isChar) {
 		bitPattern.bits = pattern;
 		bitPattern.bitCount = bitCount;
-		printf("pattern for %c has %d bits and is %08x\n", huffmanTree->c, bitCount, pattern);
 		table[INT(huffmanTree->c)] = bitPattern; 
 		return;
 	}
@@ -314,11 +309,7 @@ void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar) {
 	bits = pattern.bits << ((8 * sizeof(int)) - bitCount);
 	for(int i = 0; i < pattern.bitCount; i++) {
 		forceWrite = isLastChar && (bitCount == 1);
-		if (isLastChar) {
-			printf("nBits para %c: %d\n", c, bitCount);
-		}
 		currBit = (bits & 0x80000000) == 0x80000000 ? 1 : 0;
-		printf("%d ", currBit);
 		writeBit(currBit, file, forceWrite);
 		bitCount--;
 		bits = bits << 1;
@@ -333,7 +324,6 @@ void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HeapNode *tree) 
 	node = tree[0];
 	while(!node.isChar) {
 		bit = readBit(binaryFile);
-		printf("%d ", bit);
 		pos = bit ? RC(pos) : LC(pos);
 		node = tree[pos];
 	}

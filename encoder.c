@@ -1,6 +1,6 @@
 #include "heap.h"
 
-int main(int agrc, char *argv[]) {
+int main(int argc, char *argv[]) {
 
 	//nesse array, esta um numero de caracteres igual a numberOfDistinctChars
 	//os quais sao os caracteres presentes no arquivo texto fonte
@@ -18,8 +18,16 @@ int main(int agrc, char *argv[]) {
 	Queue q;
 	bool keepBuildingTree = TRUE;
 	FILE *binaryFile, *textFile;
-	textFile = fopen("exemplo.txt", "r");
-	binaryFile = fopen("exemplo.cmp", "wb");
+	textFile = fopen(argv[1], "r");
+	if(textFile == NULL) {
+		fprintf(stderr, "Impossivel abrir o arquivo texto solicitado.\n");
+		exit(3);
+	}
+	binaryFile = fopen(argv[2], "wb");
+	if(binaryFile == NULL) {
+		fprintf(stderr, "Impossivel abrir o arquivo binario solicitado\n");
+		exit(4);
+	}
 	numberOfDistinctChars = parse(presentChars, charOcurrenceTable, "exemplo.txt");
 	q = buildQueue(presentChars, charOcurrenceTable, numberOfDistinctChars);
 	while(keepBuildingTree) {
