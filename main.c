@@ -21,6 +21,7 @@ int main(void) {
 
 	#ifdef TEST_PARSING
 	char c[256];
+	BitPattern bitPatternTable[256];
 	int cCount, charCount[256];
 	Queue q;
 	bool cont = TRUE;
@@ -29,18 +30,25 @@ int main(void) {
 	q = buildQueue(c, charCount, cCount);
 	printQ(q);
 	while(cont) {
-		printf("================================\n");
 		q = createSubTree(q, &cont);
-		printQ(q);
 	}
-	if(q->node == NULL) printf("I really do become NULL");
-	printTree(q->node);
 	int h = height(q->node);
-	printf("height: %d\n", h);
 	int nNodes = (int)pow(2, h);
 	HeapNode baum[nNodes];
 	makeArrayRepresentation(q->node, baum, 0);
-	printArrTree(baum, 0);
+	makeBitPatternTable(q->node,bitPatternTable, 0, 0); 
+	FILE *bin = fopen("exemplo.bin", "wb");
+	fwrite(&nNodes, 1, sizeof(int), bin);
+	fwrite(baum, nNodes, sizeof(HeapNode), bin);
+	for(int count = 0; count < 8; count++) {
+		writeBit(count % 2, bin, FALSE);
+	}
+	writeBit(1, bin, TRUE);
+	fclose(bin);
+	bin = fopen("exemplo.bin", "rb");
+	fread(&nNodes, 1, sizeof(int), bin);
+	HeapNode arbol[nNodes];
+	fread(arbol, nNodes, sizeof(HeapNode), bin);
 	#endif
 
 	return 0;

@@ -32,6 +32,11 @@ typedef struct _qNode{
 	struct _qNode *next;
 } qNode;
 
+typedef struct {
+	int bits;
+	int bitCount;
+} BitPattern;
+
 typedef qNode* Queue;
 
 Heap newHeap();
@@ -50,3 +55,9 @@ qNode *newQNode(HeapNode *node);
 void printQ(Queue q);
 void printTree(HeapNode *root);
 void printArrTree(HeapNode *tree, int pos);
+void writeBit(int bit, FILE *file, bool forceWrite);
+int readBit(FILE *file);
+void makeBitPatternTable(HeapNode *huffmanTree, BitPattern *table, int pattern, int bitCount);
+void encode(BitPattern *table, FILE *file);
+void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar);
+void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HeapNode *tree);

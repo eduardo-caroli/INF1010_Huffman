@@ -11,13 +11,14 @@ Heap newHeap() {
 //chame essa funcao passando pos igual a 0 para converter a arvore inteira
 void makeArrayRepresentation(HeapNode* tree, HeapNode *array, int pos) {
 	array[pos] = *tree;
-	printf("pos: %d -> %c : %d\n", pos, array[pos].isChar ? array[pos].c : '@', array[pos].weight);
 	if(tree->isChar) return;
 	makeArrayRepresentation(tree->l, array, LC(pos));
 	makeArrayRepresentation(tree->r, array, RC(pos));
 	return;
 }
 
+//essa funcao recebe dois HeapNodes, correspondentes a caracteres ou a nos vazios,
+//e cria uma nova arvore, cujos filhos da raiz sao os nos passados como argumento
 HeapNode *mergeNodes(HeapNode *left, HeapNode *right) {
 	int sum = right->weight + left->weight; 
 	HeapNode *newNode;
@@ -27,6 +28,7 @@ HeapNode *mergeNodes(HeapNode *left, HeapNode *right) {
 	return newNode;
 }
 
+//aloca espaco e cria um novo HeapNode
 HeapNode *newHeapNode(bool isChar, char character, int weight) {
 	HeapNode *newNode;
 	newNode = (HeapNode*)malloc(sizeof(HeapNode));
@@ -99,6 +101,8 @@ void printTree(HeapNode *root) {
 	return;
 }
 
+//essa funcao retira os dois caracteres de menor peso de uma fila, cria uma subarvore
+//e reinsere a subarvore na fila
 Queue createSubTree(Queue queue, bool *cont) {
 	HeapNode *first, *second, *merged;
 	Queue q;
@@ -115,6 +119,9 @@ Queue createSubTree(Queue queue, bool *cont) {
 	return q;
 }
 
+//essa funcao recebe a saida da funcao parse (um vetor com os caracteres encontrados,
+//um vetor com a contagem de ocorrenceias de cada caracter indexavel pelo proprio caracter
+//e o numero de caracteres enconjtrados, e monta uma "fila" onde os menores caracteres vem primeiro
 Queue buildQueue(char *pChars, int *cCount, int nChars) {
 	int i;
 	HeapNode *currNode;
@@ -137,6 +144,7 @@ Queue deq(Queue queue, HeapNode **node) {
 	return aux;
 }
 
+//essa funcao ibtem a altura de uma arvore de HeapNode ligada dinamicamente
 int height(HeapNode *tree) {
 	int maxHeight, lHeight, rHeight;
 	if (tree == NULL) return 0;
@@ -146,6 +154,8 @@ int height(HeapNode *tree) {
 	return 1  + maxHeight;
 }
 
+//essa funcao percorre um arquivo txt e registra nos arrays recebidos como argumento
+//quais caracteres estao presentes e o numero de ocorrencias de cada caracter
 int parse(char *pChars, int *cCount, const char *filename) {
 	char c, *presentChars;
 	int *charCount, total = 0;
@@ -174,6 +184,7 @@ int parse(char *pChars, int *cCount, const char *filename) {
 	return total;
 }
 
+//essa funcao insere um no na posicao correta de uma fila ordenada pelo peso do no
 Queue enq(HeapNode *newNode, Queue queue) {
 	qNode *new;
 	if (queue == NULL) { 
@@ -226,8 +237,107 @@ void printQ(Queue q) {
 }
 
 void printArrTree(HeapNode tree[], int pos) {
-	printf("->pos: %d -> %c : %d\n", pos, tree[pos].c, tree[pos].weight);
+	printf("caracter %c: %d ocorrencias\n", tree[pos].c, tree[pos].weight);
 	if(tree[pos].isChar) return;	
 	if(tree->l != NULL) printArrTree(tree, LC(pos));
 	if(tree->r != NULL) printArrTree(tree, RC(pos));
+}
+
+//"escreve" um bit para um arquivo binario. como so podemos escrever 8 bits por vez,
+//a funcao armazena os bits em um buffer antes de escreve-los. Caso seja necessario
+//escrever um conjunto de bits "direto", antes de que 8 bits tenham sido escritos,
+//podemos usar setar o argumento forceWrite como TRUE.
+void writeBit(int bit, FILE *file, bool forceWrite) {
+	static int nWrittenBits = 0;
+	static unsigned char buffer = 0x00;
+	unsigned char auxByte = 0x00;
+	bool shouldWrite = (nWrittenBits == 7) || forceWrite;
+
+	auxByte = auxByte | (bit ? 0x80 : 0x00);
+	auxByte = auxByte >> nWrittenBits;
+	buffer = buffer | auxByte;
+	nWrittenBits++;
+
+	if(shouldWrite) {
+		fwrite(&buffer, sizeof(char), 1, file);
+		nWrittenBits = 0;
+		buffer = 0x00;
+	}
+}	
+
+//essa funcao le um unico bit de um arquivo binario
+int readBit(FILE *file) {
+	static int nReadBits = 0;
+	static unsigned char buffer;
+	int bit;
+	if (nReadBits == 0) fread(&buffer, sizeof(unsigned char), 1, file);
+	bit = ((buffer & 0x80) == 0x80 ? 1 : 0);
+	buffer = buffer<<1;
+	nReadBits = (nReadBits + 1) % 8;
+	return bit;
+}
+
+//monta uma tabela de simbolos em um array de BitPattern de tamanho suficiente (256)
+//no qual o indice eh o caracter desejado.
+void makeBitPatternTable(HeapNode *huffmanTree, BitPattern *table, int pattern, int bitCount) {
+	BitPattern bitPattern;
+	int lPattern, rPattern;
+	if(huffmanTree->isChar) {
+		bitPattern.bits = pattern;
+		bitPattern.bitCount = bitCount;
+		printf("pattern for %c has %d bits and is %08x\n", huffmanTree->c, bitCount, pattern);
+		table[INT(huffmanTree->c)] = bitPattern; 
+		return;
+	}
+	lPattern = pattern << 1;
+	rPattern = (pattern << 1) | 1;
+	makeBitPatternTable(huffmanTree->l, table, lPattern, bitCount+1);
+	makeBitPatternTable(huffmanTree->r, table, rPattern, bitCount+1);
+	return;
+}
+
+void encode(BitPattern *table, FILE *file) {
+	char c;
+	int i;
+	BitPattern bitPattern;
+	while(fscanf(file, "%c", &c) == 1) {
+		bitPattern = table[INT(c)];
+		i = bitPattern.bitCount;
+	}
+}
+
+void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar) {
+	BitPattern pattern = table[INT(c)];
+	int bits, currBit, bitCount;
+	bool forceWrite;
+	bitCount = pattern.bitCount;
+	bits = pattern.bits << ((8 * sizeof(int)) - bitCount);
+	for(int i = 0; i < pattern.bitCount; i++) {
+		forceWrite = isLastChar && (bitCount == 1);
+		if (isLastChar) {
+			printf("nBits para %c: %d\n", c, bitCount);
+		}
+		currBit = (bits & 0x80000000) == 0x80000000 ? 1 : 0;
+		printf("%d ", currBit);
+		writeBit(currBit, file, forceWrite);
+		bitCount--;
+		bits = bits << 1;
+	}
+}	
+
+void translateSingleCharacter(FILE *binaryFile, FILE *textFile, HeapNode *tree) {
+	int bit, pos;
+	char c;
+	HeapNode node;
+	pos = 0;
+	node = tree[0];
+	while(!node.isChar) {
+		bit = readBit(binaryFile);
+		printf("%d ", bit);
+		pos = bit ? RC(pos) : LC(pos);
+		node = tree[pos];
+	}
+	c = node.c;
+	fprintf(textFile, "%c", c);
+	return;
 }
