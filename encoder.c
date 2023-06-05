@@ -29,22 +29,30 @@ int main(int argc, char *argv[]) {
 		exit(4);
 	}
 	numberOfDistinctChars = parse(presentChars, charOcurrenceTable, "exemplo.txt");
+	printf("arquivo texto lido. ha %d caracteres distintos\n", numberOfDistinctChars);
 	q = buildQueue(presentChars, charOcurrenceTable, numberOfDistinctChars);
+	printf("fila de nos individuais montada. estado da fila (do primeiro ao ultimo no):\n");
+	printQ(q);
 	while(keepBuildingTree) {
 		q = createSubTree(q, &keepBuildingTree);
 	}
+	printf("arvore de Huffman construida. a arvore impressa em pre-ordem:\n");
+	printTree(q->node);
 	charsLeftToWrite = q->node->weight;
 	int h = height(q->node);
 	int nNodes = (int)pow(2, h);
 	HuffmanNode baum[nNodes];
 	makeArrayRepresentation(q->node, baum, 0);
 	makeBitPatternTable(q->node,bitPatternTable, 0, 0); 
+	printf("tabela de bits construida. o tamanho é muito grande, entao nao iremos imprimi-la\n");
 	fwrite(&nNodes, sizeof(int), 1, binaryFile);
 	fwrite(baum, sizeof(HuffmanNode), nNodes, binaryFile);
 	//agora vamos codificar o arquivo texto
+	printf("bitstream do arquivo comprimido:\n");
 	while(fscanf(textFile, "%c", &lastReadCharacter) == 1) {
 		writeBitPattern(lastReadCharacter, bitPatternTable, binaryFile, (charsLeftToWrite == 1));
 		charsLeftToWrite--;
 	}
+	printf("\ncompressao encerrada\n");
 	fclose(binaryFile);
 }

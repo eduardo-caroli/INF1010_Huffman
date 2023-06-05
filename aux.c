@@ -234,7 +234,11 @@ void printQ(Queue q) {
 }
 
 void printArrTree(HuffmanNode tree[], int pos) {
-	printf("caracter %c: %d ocorrencias\n", tree[pos].c, tree[pos].weight);
+	if(tree[pos].isChar) {
+		printf("caracter %c: %d ocorrencias\n", tree[pos].c, tree[pos].weight);
+	} else {
+		printf("no vazio, peso %d\n", tree[pos].weight);
+	}
 	if(tree[pos].isChar) return;	
 	if(tree->l != NULL) printArrTree(tree, LC(pos));
 	if(tree->r != NULL) printArrTree(tree, RC(pos));
@@ -250,7 +254,7 @@ void writeBit(int bit, FILE *file, bool forceWrite) {
 	unsigned char auxByte = 0x00;
 	bool shouldWrite = (nWrittenBits == 7) || forceWrite;
 
-	auxByte = auxByte | (bit ? 0x80 : 0x00);
+	auxByte = auxByte | ((bit != 0) ? 0x80 : 0x00);
 	auxByte = auxByte >> nWrittenBits;
 	buffer = buffer | auxByte;
 	nWrittenBits++;
@@ -269,6 +273,9 @@ int readBit(FILE *file) {
 	int bit;
 	if (nReadBits == 0) fread(&buffer, sizeof(unsigned char), 1, file);
 	bit = ((buffer & 0x80) == 0x80 ? 1 : 0);
+	#ifdef showBitStream
+	printf("%d ", bit);
+	#endif
 	buffer = buffer<<1;
 	nReadBits = (nReadBits + 1) % 8;
 	return bit;
@@ -311,6 +318,9 @@ void writeBitPattern(char c, BitPattern *table, FILE *file, bool isLastChar) {
 	for(int i = 0; i < pattern.bitCount; i++) {
 		forceWrite = isLastChar && (bitCount == 1);
 		currBit = (bits & 0x80000000) == 0x80000000 ? 1 : 0;
+		#ifdef showBitStream
+		printf("%d ", currBit);
+		#endif
 		writeBit(currBit, file, forceWrite);
 		bitCount--;
 		bits = bits << 1;

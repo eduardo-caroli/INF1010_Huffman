@@ -1,6 +1,7 @@
 #include "heap.h"
 
 int main(int argc, char *argv[]) {
+	printf("\niniciando decodificacao\n");
 	int nNodes, nChars;
 	FILE *binaryFile;
 	FILE *textFile;
@@ -17,13 +18,16 @@ int main(int argc, char *argv[]) {
 	fread(&nNodes, sizeof(int), 1, binaryFile);
 	HuffmanNode huffmanTree[nNodes];
 	fread(huffmanTree, sizeof(HuffmanNode), nNodes, binaryFile);
+	printf("arvore de Huffman lida do arquivo codificado\n");
+	printArrTree(huffmanTree, 0);
 	nChars = huffmanTree[0].weight;
+	printf("bitstream de caracteres lidos:\n");
 	while(nChars > 0) {
 		//funcao que recebe o bitstream biario, o de texto e a arvore e traduz de um para o outro
 		translateSingleCharacter(binaryFile, textFile, huffmanTree);
 		nChars--;
 	}
-
+	printf("\ndecodificacao encerrada\n");
 	fclose(binaryFile);
 	fclose(textFile);
 	return 0;
